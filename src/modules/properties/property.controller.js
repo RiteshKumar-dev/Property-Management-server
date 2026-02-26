@@ -144,8 +144,14 @@ export const getInterestedUsers = asyncHandler(async (req, res) => {
   }
 
   if (property.owner.toString() !== req.user._id.toString()) {
-    throw new ApiError(403, 'Not authorized to view interested users');
+    throw new ApiError(403, 'Not authorized: Only the property owner can view these leads');
   }
 
-  return res.status(200).json(new ApiResponse(200, property.interestedUsers));
+  const leads = property.interestedUsers.filter(
+    (u) => u._id.toString() !== req.user._id.toString(),
+  );
+
+  console.log(`Leads found for property ${property.title}:`, leads.length);
+
+  return res.status(200).json(new ApiResponse(200, leads, 'Interested users fetched successfully'));
 });
